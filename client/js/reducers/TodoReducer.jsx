@@ -4,46 +4,27 @@ import { createSelector } from 'reselect';
 
 // Initial State
 const initialState = {
-  data: [
-    {
-      id: cuid(),
-      title: 'Todo 1',
-      creationTime: new Date(),
-      completed: false,
-    },
-    {
-      id:cuid(),
-      title: 'Todo 2',
-      creationTime: new Date(),
-      completed: false,
-    },
-    {
-      id: cuid(),
-      title: 'Todo 3',
-      creationTime: new Date(),
-      completed: false,
-    },
-    {
-      id: cuid(),
-      title: 'Todo 4',
-      creationTime: new Date(),
-      completed: false,
-    }
-  ],
+  fetchingTodos: false,
+  working: false,
+  data: [],
   filterType: 'SHOW_ALL'
 }
 
 
 const todoReducer = (state, action) => {
   switch (action.type) {
-    case "TOGGLE_TODO": {
-      if (state.id !== action.payload.id) {
+    case "TOGGLE_TODO_FULFILLED": {
+      if (state.cuid !== action.payload.data.cuid) {
         return state;
       }
+      console.log('updating todo by toggle')
       return {
         ...state,
         completed: !state.completed
       }
+    }
+    default: {
+      return state;
     }
   }
 }
@@ -51,22 +32,60 @@ const todoReducer = (state, action) => {
 
 const todosReducer = (state = initialState, action ) => {
   switch (action.type) {
-    case "CREATE_TODO": {
+    case 'FETCH_TODOS_PENDING': {
       return {
         ...state,
-        data: state.data.concat([action.payload])
+        fetchingTodos: true,
+        working: true
       }
     }
-    case "TOGGLE_TODO": {
+    case 'FETCH_TODOS_REJECTED': {
+      return {
+        ...state,
+        fetchingTodos: false,
+        working: false
+      }
+    }
+    case 'FETCH_TODOS_FULFILLED': {
+      return {
+        ...state,
+        fetchingTodos: false,
+        working: false,
+        data: action.payload.data.todos.map(t => { return {...t, creationTime: new Date(t.creationTime)}})
+      }
+    }
+    case "CREATE_TODO_PENDING": {
+      return {
+        ...state,
+        working: true,
+      }
+    }
+    case "CREATE_TODO_REJECTED": {
+      return {
+        ...state,
+        working: false
+      }
+    }
+    case "CREATE_TODO_FULFILLED": {
+      const newTodo = action.payload.data;
+      newTodo.creationTime = new Date(newTodo.creationTime);
+
+      return {
+        ...state,
+        working: false,
+        data: state.data.concat([newTodo])
+      }
+    }
+    case "TOGGLE_TODO_FULFILLED": {
       return {
         ...state,
         data: state.data.map(todo => todoReducer(todo, action))
       }
     }
-    case "DELETE_TODO": {
+    case "DELETE_TODO_FULFILLED": {
       return {
         ...state,
-        data: state.data.filter(todo => todo.id !== action.payload.id)
+        data: state.data.filter(todo => todo.cuid !== action.payload.data.cuid)
       }
     }
     case 'FILTER_TODOS': {

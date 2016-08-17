@@ -2,7 +2,7 @@ import bodyParser from 'body-parser';
 import compression from 'compression';
 import Express from 'express';
 import path from 'path';
-
+import mongoose from 'mongoose';
 
 const app = Express();
 
@@ -19,13 +19,15 @@ if (process.env.NODE_ENV === 'development') {
   app.use(webpackHotMiddleware(compiler));
 }
 
+mongoose.connect('mongodb://localhost:27017/todo-list');
 
-
+import todoRouter from './routes/todo.routes.js';
 
 app.use(compression());
 app.use(bodyParser.json({ limit: '20mb' }));
 app.use(bodyParser.urlencoded({ limit: '20mb', extended: false }));
 app.use(Express.static(path.resolve(__dirname, '../dist')));
+app.use('/api/todos', todoRouter);
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/index.html'));

@@ -55,7 +55,7 @@ export default class TodoListItem extends Component {
 
 TodoListItem.propTypes = {
   todo: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+    cuid: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
     creationTime: PropTypes.instanceOf(Date).isRequired,
     completed: PropTypes.bool.isRequired

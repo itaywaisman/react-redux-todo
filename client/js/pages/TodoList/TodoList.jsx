@@ -19,6 +19,10 @@ class TodoList extends Component {
     super();
   }
 
+  componentDidMount() {
+    this.props.dispatch(TodoActions.fetchTodos());
+  }
+
   handleCreateTodo(title) {
     this.props.dispatch(TodoActions.createTodo(title))
   }
@@ -40,7 +44,7 @@ class TodoList extends Component {
         <List>
           {this.props.todos.map(todo =>
             <TodoListItem
-              key={todo.id}
+              key={todo.cuid}
               todo={todo}
               onToggle={() => this.handleTodoToggle(todo)}
               onDelete={() => this.handleTodoDelete(todo)}></TodoListItem>
@@ -70,7 +74,7 @@ function mapStateToProps (state) {
 
 TodoList.propTypes = {
   todos: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.string.isRequired,
+    cuid: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
     creationTime: PropTypes.instanceOf(Date).isRequired,
     completed: PropTypes.bool.isRequired
